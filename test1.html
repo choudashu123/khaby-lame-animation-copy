@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Viral Inbound</title>
+    <link rel="stylesheet" href="./styles.css" />
+
+    <!-- GSAP + ScrollTrigger -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Momo+Trust+Display&display=swap"
+      rel="stylesheet"
+    />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="loader-visual">
+      <div class="loader-visual__logo">
+        <h1>ICON PRESENTS</h1>
+      </div>
+      <div class="loader-visual__bar">
+        <div class="loader-visual__fill"></div>
+      </div>
+      <div class="loader-visual__start hidden">
+        <button class="loader-visual__button">Start Experience</button>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="hero__inner">
+        <canvas id="threeCanvas"></canvas>
+        <video
+          class="hero-video"
+          src="./assests/opener.mp4"
+          muted
+          loop
+          playsinline
+        ></video>
+        <div class="heroHeadline" id="heroHeadline">
+          <div class="heroHeadline__inner">
+            <h5 class="hero-subline">
+              An Experience with Social Media Superstar
+            </h5>
+            <h1>Khaby Lame</h1>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="text-section">
+      <div class="text-3d">Social Media Superstar2</div>
+    </section>
+
+    <section class="second-section">
+      <div class="second-div">Hello</div>
+    </section>
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
