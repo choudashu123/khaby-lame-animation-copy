@@ -131,23 +131,40 @@ window.addEventListener("DOMContentLoaded", () => {
   };
 
   const onWindowResize = () => {
-    if (!camera || !renderer) return;
+    if (!camera || !renderer || !videoElement || !planeMesh) return;
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 
+    // Wait until video metadata is loaded to get dimensions
+    const { videoWidth, videoHeight } = videoElement;
+    if (!videoWidth || !videoHeight) return;
 
-    if (videoElement && planeMesh) {
-      const { scaleX, scaleY } = getScreenToWorldScale(
-        videoElement,
-        camera,
-        camera.position.z
-      );
-      planeMesh.scale.set(scaleX, scaleY, 1);
-      planeMesh.position.set(0, 0, 0);
+    const videoAspect = videoWidth / videoHeight;
+    const screenAspect = window.innerWidth / window.innerHeight;
+
+    // Determine visible world size at the camera's Z position
+    const distance = camera.position.z;
+    const vFOV = (camera.fov * Math.PI) / 180;
+    const visibleHeight = 2 * Math.tan(vFOV / 2) * distance;
+    const visibleWidth = visibleHeight * camera.aspect;
+
+    let scaleX, scaleY;
+
+    if (screenAspect > videoAspect) {
+      // Viewport wider than video — stretch width, crop sides
+      scaleX = visibleWidth;
+      scaleY = visibleWidth / videoAspect;
+    } else {
+      // Viewport taller — stretch height, crop top/bottom
+      scaleY = visibleHeight;
+      scaleX = visibleHeight * videoAspect;
     }
-  };
+
+    planeMesh.scale.set(scaleX, scaleY, 1);
+    planeMesh.position.set(0, 0, 0);
+  }
 
   const animate = () => {
     requestAnimationFrame(animate);
