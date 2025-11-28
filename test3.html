@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    .main-container {
+      height: 100vh;
+      width: 100vw;
+    }
+    .container {
+      height: 300px;
+      width: 300px;
+      position: absolute;
+      top: -200px;
+      background-color: aqua;
+    }
+  </style>
+  <body>
+    <div class="main-container">
+      <div class="container"></div>
+    </div>
+  </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const rect = document.querySelector(".container").getBoundingClientRect();
+      console.log(rect.top, rect.height, window.innerHeight);
+    });
+  </script>
+</html>

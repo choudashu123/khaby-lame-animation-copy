@@ -95,7 +95,7 @@ window.addEventListener("DOMContentLoaded", () => {
           const material = new THREE.MeshBasicMaterial({
             color: 0xffffff,
             transparent: true,
-            opacity: 0
+            opacity: 1
           })
           const geometry = new TextGeometry(word, {
             font: loadedFont,
@@ -113,7 +113,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
           const mesh = new THREE.Mesh(geometry, material);
           mesh.position.x = offsetX;
-          mesh.position.y = -1; // place below hero
+          mesh.position.y = -5; // place below hero
           mesh.position.z = -5;
 
           offsetX += width + 0.2;
@@ -178,6 +178,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const c = window.innerHeight; // viewport height
     const a = rect.y; // distance from top
     const L = ((rect.top + rect.height) / (c + rect.height) - 0.5) * 2; // same as L(b)
+    console.log(rect, "Hello", L)
     // Apply transforms to the plane (hero section animation)
     planeMesh.position.x = -(0.001 * window.innerWidth) * L; // horizontal drift
     planeMesh.position.y = -0.5 * a * 0.01; // vertical motion (scaled down)
@@ -221,56 +222,56 @@ window.addEventListener("DOMContentLoaded", () => {
   const startBtnWrapper = document.querySelector(".loader-visual__start");
   const startBtn = document.querySelector(".loader-visual__button");
 
-  let progress = 0;
-  const fakeLoad = setInterval(() => {
-    progress += Math.random() * 10; // simulate asset loading
-    if (progress >= 100) {
-      progress = 100;
-      clearInterval(fakeLoad);
-      startBtnWrapper.classList.remove("hidden");
-    }
-    fill.style.width = `${progress}%`;
-  }, 150);
+  // let progress = 0;
+  // const fakeLoad = setInterval(() => {
+  //   progress += Math.random() * 10;
+  //   if (progress >= 100) {
+  //     progress = 100;
+  //     clearInterval(fakeLoad);
+  //     startBtnWrapper.classList.remove("hidden");
+  //   }
+  //   fill.style.width = `${progress}%`;
+  // }, 150);
 
-  const heroDOM = document.querySelector(".hero");
-  startBtn.addEventListener("click", () => {
-    loader.style.opacity = "0";
-    setTimeout(() => {
-      loader.remove();
-      // heroDOM.classList.add("is-init");
-      // here you can start audio or animations
-      const heroInner = document.querySelector(".hero__inner");
-      gsap.fromTo(
-        heroInner,
-        { yPercent: 200, rotationX: 10 },
-        {
-          yPercent: 0,
-          rotationX: 0,
-          duration: 2,
-          ease: "power2.out",
-          onComplete: () => {
-            gsap.set(heroInner, { clearProps: "all" });
-          },
-        }
-      );
-      gsap.fromTo(
-        heroHeadline,
-        { yPercent: 200, rotationX: 10, opacity: 0 },
-        {
-          yPercent: 0,
-          rotationX: 0,
-          duration: 2,
-          opacity: 1,
-          ease: "power2.out",
-          onComplete: () => {
-            gsap.set(heroInner, { clearProps: "all" });
-          },
-        }
-      );
-      initThree();
-      console.log(heroDOM.getBoundingClientRect());
-    }, 1000);
-  });
+  // const heroDOM = document.querySelector(".hero");
+  // startBtn.addEventListener("click", () => {
+  //   loader.style.opacity = "0";
+  //   setTimeout(() => {
+  //     loader.remove();
+  //     // heroDOM.classList.add("is-init");
+  //     // here you can start audio or animations
+  //     const heroInner = document.querySelector(".hero__inner");
+  //     gsap.fromTo(
+  //       heroInner,
+  //       { yPercent: 200, rotationX: 10 },
+  //       {
+  //         yPercent: 0,
+  //         rotationX: 0,
+  //         duration: 2,
+  //         ease: "power2.out",
+  //         onComplete: () => {
+  //           gsap.set(heroInner, { clearProps: "all" });
+  //         },
+  //       }
+  //     );
+  //     gsap.fromTo(
+  //       heroHeadline,
+  //       { yPercent: 200, rotationX: 10, opacity: 0 },
+  //       {
+  //         yPercent: 0,
+  //         rotationX: 0,
+  //         duration: 2,
+  //         opacity: 1,
+  //         ease: "power2.out",
+  //         onComplete: () => {
+  //           gsap.set(heroInner, { clearProps: "all" });
+  //         },
+  //       }
+  //     );
+  //     initThree();
+  //     console.log(heroDOM.getBoundingClientRect());
+  //   }, 1000);
+  // });
   window.addEventListener("resize", onWindowResize);
-  // window.onload = initThree;
+  window.onload = initThree;
 });
