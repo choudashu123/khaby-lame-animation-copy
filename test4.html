@@ -20,35 +20,143 @@
         }
       }
     </script>
+    <style>
+      .cust-slider {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Wrapper for slides */
+.cust-slider-wrapper {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 100px;
+  padding: 0 600px; /* space at ends */
+}
+
+/* Individual slides */
+.cust-slide {
+  width: 400px;
+  height: 500px;
+  flex-shrink: 0;
+  background: #e3e3e3;
+  overflow: hidden;
+  transform-origin: center center;
+}
+
+.cust-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+    </style>
   </head>
   <body>
-    <section class="hero">
-      <div class="hero__inner">
-        <canvas id="threeCanvas"></canvas>
-        <video
-          class="hero-video"
-          src="./assests/opener.mp4"
-          muted
-          loop
-          playsinline
-        ></video>
-        <div class="heroHeadline" id="heroHeadline">
-          <div class="heroHeadline__inner">
-            <h5 class="hero-subline">
-              An Experience with Social Media Superstar
-            </h5>
-            <h1>Khaby Lame</h1>
-          </div>
-        </div>
+    <section class="cust-slider">
+      <div class="cust-slider-wrapper">
+        <!-- Replace these with your actual images -->
+        <div class="cust-slide"><img src="https://khaby.rocani.co/assets/images/gallery/Khaby-Gallery-01.jpg" alt="" /></div>
+        <div class="cust-slide"><img src="https://khaby.rocani.co/assets/images/gallery/Khaby-Gallery-02.jpg" alt="" /></div>
+        <div class="cust-slide"><img src="https://khaby.rocani.co/assets/images/gallery/Khaby-Gallery-06.jpg" alt="" /></div>
+        <div class="cust-slide"><img src="https://khaby.rocani.co/assets/images/gallery/Khaby-Gallery-05.jpg" alt="" /></div>
+        <div class="cust-slide"><img src="https://khaby.rocani.co/assets/images/gallery/Khaby-Gallery-04.jpg" alt="" /></div>
+        <div class="cust-slide"><img src="https://khaby.rocani.co/assets/images/gallery/Khaby-Gallery-03.jpg" alt="" /></div>
+        <div class="cust-slide"><img src="https://khaby.rocani.co/assets/images/gallery/Khaby-Gallery-07.jpg" alt="" /></div>
       </div>
     </section>
-    <section class="text-section">
-      <div class="text-3d">Social Media Superstar2</div>
-    </section>
-
-    <section class="second-section">
-      <div class="second-div">Hello</div>
-    </section>
-    <script type="module" src="./script3.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        let target  = 0;
+        let current = 0;
+        const ease  = 0.075;
+      
+        const slider        = document.querySelector('.cust-slider');
+        const sliderWrapper = document.querySelector('.cust-slider-wrapper');
+        const slides        = document.querySelectorAll('.cust-slide');
+        let maxScroll       = sliderWrapper.scrollWidth - window.innerWidth;
+      
+        // Linear interpolation for smooth movement
+        function lerp(start, end, factor) {
+          return start + (end - start) * factor;
+        }
+      console.log("hello")
+        // Update scaling/offset for each slide based on distance from viewport centre
+        function updateScaleAndPosition() {
+          const viewportCentre = window.innerWidth / 2;
+          slides.forEach(slide => {
+            const rect      = slide.getBoundingClientRect();
+            const centre    = (rect.left + rect.right) / 2;
+            const distance  = centre - viewportCentre;
+            let scale, offsetX;
+            if (distance > 0) {
+              scale   = Math.min(1.75, 1 + distance / window.innerWidth);
+              offsetX = (scale - 1) * 300;
+            } else {
+              scale   = Math.max(0.5, 1 - Math.abs(distance) / window.innerWidth);
+              offsetX = 0;
+            }
+            gsap.set(slide, { scale: scale, x: offsetX });
+          });
+        }
+      
+        // Render loop for smooth horizontal motion
+        function animate() {
+          current = lerp(current, target, ease);
+          gsap.set(sliderWrapper, { x: -current });
+          updateScaleAndPosition();
+          requestAnimationFrame(animate);
+        }
+        animate();
+      
+        // Wheel handler: only runs when slider is pinned and still visible
+        function handleWheel(e) {
+          const rect        = slider.getBoundingClientRect();
+          const pinned      = rect.top <= 0 && rect.bottom > 0;  // element at top AND still visible:contentReference[oaicite:3]{index=3}
+          if (!pinned) return;
+      
+          if (e.deltaY < 0 && target <= 0) return;
+          if (e.deltaY > 0 && target >= maxScroll) return;
+      
+          target += e.deltaY;
+          target = Math.max(0, Math.min(target, maxScroll));
+          e.preventDefault();
+        }
+      
+        // Observe when the slider enters/leaves the viewport
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              window.addEventListener('wheel', handleWheel, { passive: false });
+            } else {
+              window.removeEventListener('wheel', handleWheel, { passive: false });
+            }
+          });
+        }, { threshold: 0 });
+        observer.observe(slider);
+      
+        // Lock the page at the slider’s top while horizontal scrolling is active
+        document.addEventListener('scroll', () => {
+          const rect  = slider.getBoundingClientRect();
+          const atTop = Math.abs(rect.top) <= 5;
+          if (atTop && target > 0 && target < maxScroll) {
+            const offset = slider.offsetTop;
+            if (window.scrollY !== offset) {
+              window.scrollTo(0, offset);
+            }
+          }
+        });
+      
+        // Recalculate maxScroll on resize
+        window.addEventListener('resize', () => {
+          maxScroll = sliderWrapper.scrollWidth - window.innerWidth;
+          target    = Math.min(target, maxScroll);
+        });
+      });
+      </script>
   </body>
 </html>

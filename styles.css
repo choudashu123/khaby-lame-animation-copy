@@ -3,7 +3,6 @@
         margin: 0;
         padding: 0;
         overflow-x: hidden;
-        height: 500vh;
         background: #000000;
         font-family: "Momo Trust Display", sans-serif;
         font-weight: 400;
@@ -19,6 +18,7 @@
         height: 100vh;
         overflow: hidden;
         z-index: 10;
+        /* background-color: rgb(65, 133, 133); */
 
       }
 
@@ -26,15 +26,18 @@
         position: relative;
         height: 100%;
         width: 100%;
-        /* transform: translateY(200%) rotateX(10deg);
+        /* transform: translateY(200%);
         transition: transform 2s cubic-bezier(.215, .61, .355, 1); */
-
       }
 
-      .hero.is-init .hero__inner {
+      /* .hero.is-init .hero__inner {
         transform: translateY(0) rotateX(0);
         opacity: 1;
-      }
+      } */
+
+      /* .is-init {
+        transform: translateY(0);
+      } */
 
       .hero-video {
         position: absolute;
@@ -77,7 +80,7 @@
         padding-left: 10px;
         padding-right: 10px;
         z-index: 115;
-        opacity: 0;
+        opacity: 1;
       }
 
       .heroHeadline h1 {
@@ -98,8 +101,8 @@
 
       @media screen and (min-width:320px) {
         .heroHeadline h1 {
-          font-size: calc(40px + 108 * (100vw - 320px) / 1080);
-          line-height: calc(40px + 108 * (100vw - 320px) / 1080);
+          font-size: calc(10px + 108 * (100vw - 320px) / 1080);
+          line-height: calc(10px + 108 * (100vw - 320px) / 1080);
         }
       }
 
@@ -226,7 +229,7 @@
         margin-top: 400px;
         position: relative;
         background: transparent;
-        /* background-color: aqua; */
+        background-color: aqua;
       }
 
       .text-3d {}
@@ -234,7 +237,7 @@
       h2.is-large {
         font-size: 84px;
         line-height: 84px;
-        opacity: 0;
+        /* opacity: 1; */
       }
 
       @media screen and (min-width:320px) {
