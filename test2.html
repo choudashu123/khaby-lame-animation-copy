@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Viral Inbound</title>
-    <link rel="stylesheet" href="./style2.css" />
+    <link rel="stylesheet" href="./test2.css" />
 
     <!-- GSAP + ScrollTrigger -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -20,57 +20,152 @@
         }
       }
     </script>
+    <style>
+
+body, html{
+  background-color: #000;
+  overflow-x: hidden;
+}
+
+*{
+  padding: 0;
+  margin: 0;
+}
+
+.interview {
+  display: flex;
+  align-items: center;
+  /* background-color: antiquewhite; */
+  height: 240vh;
+}
+
+.interview__inner {
+  /* background-color: aquamarine; */
+  width: 100%;
+  text-align: center;
+  /* position: sticky;
+  top: 35vh; */
+}
+.interview{
+  display: flex;
+  flex-direction: column;
+  perspective: 800px;
+}
+.interview-video{
+  height: 50vh;
+  margin-left: 30vw;
+  width: 100%;
+  /* background-color: rgb(118, 58, 58); */
+  perspective: 900px;
+  position: relative;
+  /* opacity: 0.2; */
+}
+.heros-video{
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  z-index: 99999999;
+}
+  
+  .video-placeholder {
+    position: absolute;
+    top: 0;
+    left: 220;
+    width: 40vw;
+    /* height: 60vh; */
+    /* background-color: aqua; */
+  border-radius: 20px;
+  opacity: 1;
+}
+h2{
+  /* background-color: aqua; */
+  color: rgb(0, 0, 0);
+}
+.interview-question{
+  color: white;
+  font-size: 80px;
+  line-height: 80px;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+  backface-visibility: hidden;
+  -webkit-mask-image: linear-gradient(to left, #000 50%, transparent 100%);
+mask-image: linear-gradient(to left, #000 50%, transparent 100%);
+-webkit-mask-repeat: no-repeat;
+mask-repeat: no-repeat;
+mask-position: right top;
+
+  opacity: 1;
+  /* transition: opacity 0.2s ease-out; */
+}
+.interview__inner {
+  perspective: 800px;
+}
+.center-line{
+  position: fixed;
+  width: 100%;
+  left: 0;
+  top: 50%;
+  transform: translate(0 -50%);
+  color: blue;
+  background-color: blue;
+  height: 1px;
+  z-index: 9999;
+}
+.scroll-section{
+  height: 100vh;
+  width: 100vw;
+  background-color: yellowgreen;
+}
+    </style>
   </head>
   <body>
-    <!-- <div class="loader-visual">
-      <div class="loader-visual__logo">
-        <h1>ICON PRESENTS</h1>
-      </div>
-      <div class="loader-visual__bar">
-        <div class="loader-visual__fill"></div>
-      </div>
-      <div class="loader-visual__start hidden">
-        <button class="loader-visual__button">Start Experience</button>
-      </div>
-    </div> -->
-
-    <section class="hero" data-type="FULL_SIZE">
-      <div class="hero__inner">
-        <canvas id="threeCanvas"></canvas>
-        <video
-          class="hero-video"
-          src="./assests/opener.mp4"
-          muted
-          loop
-          playsinline
-        ></video>
-        <div class="heroHeadline" id="heroHeadline">
-          <div class="heroHeadline__inner">
-            <h5 class="hero-subline">
-              An Experience with Social Media Superstar
-            </h5>
-            <h1>Khaby Lame</h1>
-          </div>
-        </div>
-      </div>
-    </section>
-    <section class="intro-section scroll-area"  data-type="BLOCKER" style="background-color: aquamarine;">
+    <div class="center-line"></div>
+    <section class="scroll-section"></section>
+    <section class="intro-section" data-type="BLOCKER">
       <div class="intro" data-scroll="true" id="intro">
         <div class="intro__inner">
           <div class="intro-headlines js-headline-lines">
-              <h2 class="reveal-text">No. 1 Anchor</h2>
-              <h2 class="reveal-text">Anuj Char</h2>
-              <h2 class="reveal-text">Where Every</h2>
-              <h2 class="reveal-text">Event Finds</h2>
-              <h2 class="reveal-text">Its Voice!</h2>
+            <h2 class="is-large">No. 1 Anchor</h2>
+            <h2 class="is-large">Anuj Char</h2>
+            <h2 class="is-large">Where Every</h2>
+            <h2 class="is-large">Event Finds</h2>
+            <h2 class="is-large">Its Voice!</h2>
           </div>
         </div>
       </div>
     </section>
-
-    <section class="second-section">
-      <div class="second-div" style="display: flex; justify-content: center; align-items: center;">hello</div>
+    <section class="interview" id="interview-1">
+      <div class="interview__inner">
+        <h2 class="interview-question js-interview-question">
+          When the internet
+        </h2>
+        <h2 class="interview-question js-interview-question">
+          breaks down, how
+        </h2>
+        <h2 class="interview-question js-interview-question">
+          do you react?
+        </h2>
+    
+        
+      </div>
+      <div class="interview-video">
+        <div class="video-placeholder">
+          <video
+            class="heros-video"
+            src="./assests/opener.mp4"
+            muted
+            loop
+            playsinline></video>
+        </div>
+      </div>
     </section>
-    <script type="module" src="./script1.js"></script>
+    <section class="scroll-section"></section>
+
+    
+
+    <!-- <section class="second-section">
+      <div class="second-div" style="display: flex; justify-content: center; align-items: center;">hello</div>
+    </section> -->
+    <script type="module" src="./script2.js"></script>
   </body>
 </html>

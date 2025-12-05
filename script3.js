@@ -1,10 +1,253 @@
 // drop-in JS (module). Place after your HTML, or in a module file.
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
-import { FontLoader } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/FontLoader.js";
-import { TextGeometry } from "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/geometries/TextGeometry.js";
+
+gsap.registerPlugin(ScrollTrigger);
 
 window.addEventListener("DOMContentLoaded", () => {
+  gsap.utils.toArray(".js-text-block").forEach(text => {
+    gsap.to(text, {
+      opacity: 1,
+      duration: 0.6,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: text,
+        start: "top 80%", // text enters screen
+        toggleActions: "play none none reverse",
+      }
+    });
+  });
 
+  const introTextSec = document.querySelector(".intro-text")
+  const overlay = document.querySelector(".gradient-overlay");
+  const lastText = document.querySelector(".js-text-block:last-child");
+
+
+  ScrollTrigger.create({
+    trigger: lastText,
+    start: "top top",   // When top of last block reaches 50vh
+    onEnter: () => overlay.classList.add("hide"),
+    onLeaveBack: () => overlay.classList.remove("hide"),
+  });
+  let target = 0;
+  let current = 0;
+  const ease = 0.075;
+
+  const slider = document.querySelector('.cust-slider');
+  const sliderWrapper = document.querySelector('.cust-slider-wrapper');
+  const slides = document.querySelectorAll('.cust-slide');
+  let maxScroll = sliderWrapper.scrollWidth - window.innerWidth;
+
+  // Linear interpolation for smooth movement
+  function lerp(start, end, factor) {
+    return start + (end - start) * factor;
+  }
+
+  // Update scaling/offset for each slide based on distance from viewport centre
+  function updateScaleAndPosition() {
+    const viewportCentre = window.innerWidth / 2;
+    slides.forEach(slide => {
+      const rect12 = slide.getBoundingClientRect();
+      const centre = (rect12.left + rect12.right) / 2;
+      const distance = centre - viewportCentre;
+      let scale, offsetX;
+      if (distance > 0) {
+        scale = Math.min(1.75, 1 + distance / window.innerWidth);
+        offsetX = (scale - 1) * 300;
+      } else {
+        scale = Math.max(0.5, 1 - Math.abs(distance) / window.innerWidth);
+        offsetX = 0;
+      }
+      gsap.set(slide, { scale: scale, x: offsetX });
+    });
+  }
+
+  // Render loop for smooth horizontal motion
+  function animate() {
+    current = lerp(current, target, ease);
+    gsap.set(sliderWrapper, { x: -current });
+    updateScaleAndPosition();
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // Wheel handler: only runs when slider is pinned and still visible
+  function handleWheel(e) {
+    const rect = slider.getBoundingClientRect();
+    const pinned = rect.top <= 0 && rect.bottom > 0;  // element at top AND still visible:contentReference[oaicite:3]{index=3}
+    if (!pinned) return;
+
+    if (e.deltaY < 0 && target <= 0) return;
+    if (e.deltaY > 0 && target >= maxScroll) return;
+
+    target += e.deltaY;
+    target = Math.max(0, Math.min(target, maxScroll));
+    e.preventDefault();
+  }
+
+  // Observe when the slider enters/leaves the viewport
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        window.addEventListener('wheel', handleWheel, { passive: false });
+      } else {
+        window.removeEventListener('wheel', handleWheel, { passive: false });
+      }
+    });
+  }, { threshold: 0 });
+  observer.observe(slider);
+
+  // Lock the page at the slider’s top while horizontal scrolling is active
+  document.addEventListener('scroll', () => {
+    const rect = slider.getBoundingClientRect();
+    const atTop = Math.abs(rect.top) <= 5;
+    if (atTop && target > 0 && target < maxScroll) {
+      const offset = slider.offsetTop;
+      if (window.scrollY !== offset) {
+        window.scrollTo(0, offset);
+      }
+    }
+
+    if (introTextSec.getBoundingClientRect().top < window.innerHeight) {
+      overlay.style.opacity = 1
+    } else {
+
+      overlay.style.opacity = 0
+    }
+  });
+
+  // Recalculate maxScroll on resize
+  window.addEventListener('resize', () => {
+    maxScroll = sliderWrapper.scrollWidth - window.innerWidth;
+    target = Math.min(target, maxScroll);
+  });
+
+
+  const container = document.querySelector(".interview__inner"); // this holds perspective
+  const titles = Array.from(container.querySelectorAll("h2"));
+  const videoEl = document.querySelector(".heros-video")
+  const videoWrapper = document.querySelector(".video-placeholder")
+
+  const introContainer = document.querySelector(".intro-section")
+  const introTitles = Array.from(introContainer.querySelectorAll("h2"))
+  console.log("introTitles", introTitles)
+
+  const vw = videoEl.videoWidth
+  const vh = videoEl.videoHeight
+  console.log(vw, vh)
+  // videoWrapper.style.height = 80 %
+
+  // ensure parent has perspective (important for 3D)
+  // gsap.set(container, { perspective: 900 });
+
+  gsap.set(introTitles, {
+    transformOrigin: "center center",
+    rotationY: -90,         // start closed (rotate away)
+    rotationZ: 15,
+    opacity: 0,
+    transformStyle: "preserve-3d",
+    WebkitMaskSize: "0% 100%",
+    maskSize: "0% 100%",
+    backfaceVisibility: "hidden",
+  })
+
+  const tl1 = gsap.timeline({
+    scrollTrigger: {
+      trigger: introContainer,
+      start: "top 80%",
+      end: "+=100%",
+      scrub: true,
+      // markers: true
+    }
+  })
+  tl1.to(introTitles, {
+    rotationY: 0,
+    rotationZ: 0,
+    opacity: 1,
+    WebkitMaskSize: "100% 100%",
+    maskSize: "100% 100%",
+    stagger: {
+      each: 0.2,
+      onComplete: function () {
+        // Create a mini timeline for each element
+        // let mtl1 = gsap.timeline();
+        const el = this._targets[0];
+        console.log("el", el)
+
+        gsap.to(el, {
+          rotationY: 320,
+          rotationX: 20,
+          // ease: "none",
+          scrollTrigger: {
+            trigger: el,
+            start: `top 40%`, // shifted per element
+            end: "+=400%",
+            scrub: true,
+            // markers: true
+          }
+        });
+      }
+    },
+    ease: "power2.out",
+  })
+
+  // initial state: hinge at left, rotated away, hidden
+  gsap.set(titles, {
+    transformOrigin: "center center",
+    rotationY: -90,         // start closed (rotate away)
+    rotationZ: 15,
+    opacity: 0,
+    transformStyle: "preserve-3d",
+    WebkitMaskSize: "0% 100%",
+    maskSize: "0% 100%",
+    backfaceVisibility: "hidden",
+  });
+  gsap.set(".video-placeholder", {
+    transformOrigin: "right center",
+    y: 250,
+    rotationY: 95,
+    rotationZ: -5,
+    opacity: 1,
+    transformStyle: "preserve-3d",
+  });
+
+  // animate lines in with stagger while the section is pinned
+  const tl = gsap.timeline({
+    scrollTrigger: {
+      trigger: ".interview",
+      start: "top 80%",   // animation starts when trigger reaches center of screen
+      end: "+=100%",       // how long the scroll controls the animation
+      scrub: true,
+      // markers: true
+    }
+  });
+
+  // Step 1: Reveal text with flip-in animation
+  tl.to(titles, {
+    rotationY: 0,
+    rotationZ: 0,
+    opacity: 1,
+    WebkitMaskSize: "100% 100%",
+    maskSize: "100% 100%",
+    stagger: 0.4,
+    ease: "power2.out",
+  })
+    .to(videoWrapper, {
+      rotationY: 20,
+      rotationZ: 0,
+      y: 40,
+      // duration: 2
+      // ease: "expoScale(0.5,7,none)"
+    }, "<80%")
+    .to(container, {
+      rotationY: 10,
+      ease: "power2.inOut",
+      // duration: 1
+    })
+    .to(videoWrapper, {
+      rotationY: 25,
+      // ease: "expoScale(0.5,7,none)",
+      y: -300
+    }, "<95%")
   console.log(document.querySelector(".hero").offsetHeight)
 
 
@@ -58,81 +301,7 @@ window.addEventListener("DOMContentLoaded", () => {
   }
 
 
-  function computeGeometryUVs(geometry) {
-    // Ensure position attribute exists
-    const pos = geometry.attributes.position;
-    if (!pos) return;
 
-    // compute bounding box (min/max in local space)
-    geometry.computeBoundingBox();
-    const bbox = geometry.boundingBox;
-    const sizeX = bbox.max.x - bbox.min.x || 1;
-    const sizeY = bbox.max.y - bbox.min.y || 1;
-
-    // prepare uv attribute (2 floats per vertex)
-    const uvCount = pos.count * 2;
-    const uvArray = new Float32Array(uvCount);
-    // temporary vector for reading vertex position
-    const v = new THREE.Vector3();
-
-    for (let i = 0; i < pos.count; i++) {
-      v.fromBufferAttribute(pos, i);
-      // map x -> [0,1] across bbox.x and y -> [0,1] across bbox.y
-      const u = (v.x - bbox.min.x) / sizeX;
-      const vval = (v.y - bbox.min.y) / sizeY;
-      uvArray[i * 2 + 0] = u;
-      uvArray[i * 2 + 1] = vval;
-    }
-
-    // attach or update the uv attribute
-    if (geometry.attributes.uv) {
-      geometry.attributes.uv.array.set(uvArray);
-      geometry.attributes.uv.needsUpdate = true;
-    } else {
-      geometry.setAttribute("uv", new THREE.BufferAttribute(uvArray, 2));
-    }
-  }
-
-  function createRevealMaterial(color = 0xffffff) {
-    return new THREE.ShaderMaterial({
-      transparent: true,
-      uniforms: {
-        uReveal: { value: 0.0 },    // 0 = hidden, 1 = fully revealed
-        uEdge: { value: 0.03 },   // softness of the edge
-        uColor: { value: new THREE.Color(color) }
-      },
-      vertexShader: `
-      varying vec2 vUv;
-      void main() {
-        vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-      fragmentShader: `
-      varying vec2 vUv;
-uniform float uReveal;
-uniform float uEdge;
-uniform vec3 uColor;
-
-void main() {
-    float cutoff = 1.0 - uReveal;
-    float mask;
-
-    if (uReveal < 1.0 - 1e-5) {
-        // With soft edge during reveal
-        mask = smoothstep(cutoff - uEdge, cutoff + uEdge, vUv.x);
-    } else {
-        // Once fully revealed, make edge crisp
-        mask = step(cutoff, vUv.x);
-    }
-
-    gl_FragColor = vec4(uColor, mask);
-
-    if (gl_FragColor.a < 0.01) discard;
-}
-    `
-    });
-  }
 
   // ---------- Section base ----------
   class Section3D {
@@ -149,7 +318,7 @@ void main() {
       this._loaded = false;
 
       if (this.type === "FULL_SIZE") this._createVideoPlane();
-      if (this.type === "BLOCKER") this._createTextBlock();
+      // if (this.type === "BLOCKER") this._createTextBlock();
     }
 
 
@@ -217,92 +386,6 @@ void main() {
       mesh.position.set(0, 0, 0);
     }
 
-    // ---------- BLOCKER text block (one mesh per <h2>) ----------
-    _createTextBlock() {
-      const headings = Array.from(this.domEl.querySelectorAll("h2"));
-      if (!headings.length) {
-        console.warn("No h2 elements found for BLOCKER section");
-        this._loaded = true;
-        return;
-      }
-
-      const loader = new FontLoader();
-      loader.load(
-        "https://threejs.org/examples/fonts/helvetiker_bold.typeface.json",
-        (font) => {
-          const meshes = [];
-          this.domLines = headings;
-
-          // create meshes and measure heights for spacing
-          this.domLines.forEach((lineEl, i) => {
-            const text = (lineEl.textContent || "").trim();
-            const geo = new TextGeometry(text, {
-              font,
-              size: 1.42,
-              height: 0.08,
-              curveSegments: 12,
-              bevelEnabled: false,
-            });
-
-            geo.computeBoundingBox();
-            const box = geo.boundingBox || { min: { y: 0 }, max: { y: 0 } };
-            const height = (box.max.y - box.min.y) || 0.8;
-            const width = (box.max.x - box.min.x) || 1;
-            // console.log(height, width)
-
-            geo.center();
-
-            computeGeometryUVs(geo);
-
-            // 3) create reveal material (one per mesh or share material with separate uniform copies)
-            const material = createRevealMaterial(0xffffff);
-
-            // const mat = new THREE.MeshStandardMaterial({
-            //   color: 0xffffff,
-            //   transparent: true,
-            //   opacity: 1,
-            //   metalness: 0,
-            //   roughness: 0.6,
-            // });
-
-            const mesh = new THREE.Mesh(geo, material);
-            mesh.userData._lineHeight = height;
-            mesh.userData._lineWidth = width;
-            meshes.push(mesh);
-            this.group.add(mesh);
-          });
-
-          // compute spacing
-          const spacingFactor = 1.25;
-          const heights = meshes.map(m => m.userData._lineHeight || 0.9);
-          const lineSpacing = heights.length ? Math.max(...heights) * spacingFactor : 1;
-          // console.log(lineSpacing, heights)
-
-          // position meshes and store baseY so floats don't accumulate
-          meshes.forEach((mesh, i) => {
-            const baseY = -(lineSpacing * i);
-            mesh.userData.baseY = baseY;
-            mesh.position.y = baseY;
-            mesh.position.z = -6;
-            // console.log("mesh.position", i, mesh.position)
-          });
-
-          // center the block vertically
-          const totalHeight = (meshes.length - 1) * lineSpacing;
-          // console.log("totalHeight", totalHeight)
-          this.group.position.y = totalHeight * 0.5;
-
-          this.meshes = meshes;
-          this._lineSpacing = lineSpacing;
-          this._loaded = true;
-        },
-        undefined,
-        (err) => {
-          console.error("Font load error:", err);
-          this._loaded = true;
-        }
-      );
-    }
 
     // ---------- Scroll-driven update ----------
     updateScroll() {
@@ -323,51 +406,7 @@ void main() {
         }
         return;
       }
-      const introRect = this.rect()
-      const pSection = (introRect.top + introRect.height * 0.5 - winH * 0.5) / winH;
-      this.group.position.y = pSection * -12 + 4;
 
-
-      // BLOCKER: per-line DOM-driven progress (so order matches DOM visibility)
-
-      this.meshes.forEach((mesh, i) => {
-        const lineEl = this.domLines[i];
-        if (!lineEl) return;
-
-        const lineRect = lineEl.getBoundingClientRect();
-        const lineCenter = lineRect.top + lineRect.height * 0.5;
-        const px = (lineCenter - winH * 0.5) / winH;
-        // console.log("px", px, i)
-
-        // small optional stagger for nicer wheel feeling (very small)
-        const stagger = 0.06; // set to 0 to strictly follow DOM; increase slightly (0.06) if you want a little lag
-        const pr = px - (i * stagger);
-        const distance = Math.abs(pr);
-        const baseY = mesh.userData.baseY || (-(this._lineSpacing || 1) * i);
-        // console.log("baseY", baseY)
-
-        let progress = 1.0 - Math.min(1.0, Math.abs(px) * 3.0); // tune 3.0 to adjust reveal window
-        progress = Math.max(0, Math.min(1, progress)); // clamp 0..1
-
-        // But the reference wants: reveal grows as it *approaches center*, and _stays_ revealed
-        // after crossing center. That means we should take max(current, previous).
-        mesh.userData.revealProgress = Math.max(mesh.userData.revealProgress || 0, progress);
-
-        // set uniform (material per-mesh)
-        if (mesh.material && mesh.material.uniforms) {
-          mesh.material.uniforms.uReveal.value = mesh.userData.revealProgress;
-        }
-
-        // position, depth, rotation, opacity
-        // mesh.position.y = mesh.userData.baseY + px * -7;
-        // mesh.position.z = -11 - distance * 3;
-        mesh.rotation.y = px * 1.5;
-        mesh.material.opacity = 1
-
-        const canvasel = document.querySelector("#threeCanvas")
-        // console.log("window.innerHeight, window.innerWidth", window.innerHeight, window.innerWidth, canvasel.offsetHeight, canvasel.offsetWidth)
-
-      });
     }
 
     // ---------- Continuous micro-animations ----------

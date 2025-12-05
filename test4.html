@@ -54,9 +54,47 @@
   object-position: center;
   display: block;
 }
+.intro-text {
+  width: 100%;
+  padding: 10vh 1rem 10vh; /* scroll space above + below */
+}
+
+.intro-text-text {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.gradient-overlay {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 50vh; /* bottom half of screen */
+  pointer-events: none;
+  background: linear-gradient(to top, black 30%, transparent 100%);
+  /* mix-blend-mode: multiply; */
+  transition: opacity 0.4s ease-out;
+  z-index: 10;
+}
+
+.gradient-overlay.hide {
+  opacity: 0;
+}
+
+.js-text-block {
+  font-size: 2rem;
+  color: #fff;
+  opacity: 1;
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 3rem 0;
+  will-change: opacity;
+  transition: opacity 0.4s ease-out;
+}
+
     </style>
   </head>
   <body>
+    <div class="bottom-blur"></div>
     <section class="cust-slider">
       <div class="cust-slider-wrapper">
         <!-- Replace these with your actual images -->
@@ -69,94 +107,149 @@
         <div class="cust-slide"><img src="https://khaby.rocani.co/assets/images/gallery/Khaby-Gallery-07.jpg" alt="" /></div>
       </div>
     </section>
+    <section class="intro-text" data-scroll="true">
+      <div class="gradient-overlay"></div> <!-- NEW -->
+      <div class="intro-text__wrapper">
+        <div class="intro-text-text">
+          <p class="js-text-block">Capitolium, Brescia, Italy</p>
+          <p class="js-text-block">
+            He stands for everything that gives us hope: he is young, has a sense of
+            humour, a warm heart and a clear point of view. Khaby is living proof
+            that destiny is something that can be challenged.
+            He stands for everything that gives us hope: he is young, has a sense of
+            humour, a warm heart and a clear point of view. Khaby is living proof
+            that destiny is something that can be challenged.
+          </p>
+          <p class="js-text-block">
+            Khaby Lame, the social media superstar...
+            He stands for everything that gives us hope: he is young, has a sense of
+            humour, a warm heart and a clear point of view. Khaby is living proof
+            that destiny is something that can be challenged.He stands for everything that gives us hope: he is young, has a sense of
+            humour, a warm heart and a clear point of view. Khaby is living proof
+            that destiny is something that can be challenged.
+          </p>
+        </div>
+      </div>
+    </section>
+    <section style="height: 100vh; width: 100%; background-color: #e3e3e3;">
+
+    </section>
+    
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        let target  = 0;
-        let current = 0;
-        const ease  = 0.075;
-      
-        const slider        = document.querySelector('.cust-slider');
-        const sliderWrapper = document.querySelector('.cust-slider-wrapper');
-        const slides        = document.querySelectorAll('.cust-slide');
-        let maxScroll       = sliderWrapper.scrollWidth - window.innerWidth;
-      
-        // Linear interpolation for smooth movement
-        function lerp(start, end, factor) {
-          return start + (end - start) * factor;
-        }
-      console.log("hello")
-        // Update scaling/offset for each slide based on distance from viewport centre
-        function updateScaleAndPosition() {
-          const viewportCentre = window.innerWidth / 2;
-          slides.forEach(slide => {
-            const rect      = slide.getBoundingClientRect();
-            const centre    = (rect.left + rect.right) / 2;
-            const distance  = centre - viewportCentre;
-            let scale, offsetX;
-            if (distance > 0) {
-              scale   = Math.min(1.75, 1 + distance / window.innerWidth);
-              offsetX = (scale - 1) * 300;
-            } else {
-              scale   = Math.max(0.5, 1 - Math.abs(distance) / window.innerWidth);
-              offsetX = 0;
-            }
-            gsap.set(slide, { scale: scale, x: offsetX });
-          });
-        }
-      
-        // Render loop for smooth horizontal motion
-        function animate() {
-          current = lerp(current, target, ease);
-          gsap.set(sliderWrapper, { x: -current });
-          updateScaleAndPosition();
-          requestAnimationFrame(animate);
-        }
-        animate();
-      
-        // Wheel handler: only runs when slider is pinned and still visible
-        function handleWheel(e) {
-          const rect        = slider.getBoundingClientRect();
-          const pinned      = rect.top <= 0 && rect.bottom > 0;  // element at top AND still visible:contentReference[oaicite:3]{index=3}
-          if (!pinned) return;
-      
-          if (e.deltaY < 0 && target <= 0) return;
-          if (e.deltaY > 0 && target >= maxScroll) return;
-      
-          target += e.deltaY;
-          target = Math.max(0, Math.min(target, maxScroll));
-          e.preventDefault();
-        }
-      
-        // Observe when the slider enters/leaves the viewport
-        const observer = new IntersectionObserver(entries => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              window.addEventListener('wheel', handleWheel, { passive: false });
-            } else {
-              window.removeEventListener('wheel', handleWheel, { passive: false });
-            }
-          });
-        }, { threshold: 0 });
-        observer.observe(slider);
-      
-        // Lock the page at the slider’s top while horizontal scrolling is active
-        document.addEventListener('scroll', () => {
-          const rect  = slider.getBoundingClientRect();
-          const atTop = Math.abs(rect.top) <= 5;
-          if (atTop && target > 0 && target < maxScroll) {
-            const offset = slider.offsetTop;
-            if (window.scrollY !== offset) {
-              window.scrollTo(0, offset);
-            }
-          }
-        });
-      
-        // Recalculate maxScroll on resize
-        window.addEventListener('resize', () => {
-          maxScroll = sliderWrapper.scrollWidth - window.innerWidth;
-          target    = Math.min(target, maxScroll);
-        });
-      });
+
+      gsap.registerPlugin(ScrollTrigger);
+document.addEventListener('DOMContentLoaded', () => {
+
+  gsap.utils.toArray(".js-text-block").forEach(text => {
+    gsap.to(text, {
+      opacity: 1,
+      duration: 0.6,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: text,
+        start: "top 80%", // text enters screen
+        toggleActions: "play none none reverse",
+      }
+    });
+  });
+
+  const overlay = document.querySelector(".gradient-overlay");
+  const lastText = document.querySelector(".js-text-block:last-child");
+
+  ScrollTrigger.create({
+    trigger: lastText,
+    start: "top top",   // When top of last block reaches 50vh
+    onEnter: () => overlay.classList.add("hide"),
+    onLeaveBack: () => overlay.classList.remove("hide"),
+  });
+
+  let target  = 0;
+  let current = 0;
+  const ease  = 0.075;
+
+  const slider        = document.querySelector('.cust-slider');
+  const sliderWrapper = document.querySelector('.cust-slider-wrapper');
+  const slides        = document.querySelectorAll('.cust-slide');
+  let maxScroll       = sliderWrapper.scrollWidth - window.innerWidth;
+
+  // Linear interpolation for smooth movement
+  function lerp(start, end, factor) {
+    return start + (end - start) * factor;
+  }
+
+  // Update scaling/offset for each slide based on distance from viewport centre
+  function updateScaleAndPosition() {
+    const viewportCentre = window.innerWidth / 2;
+    slides.forEach(slide => {
+      const rect      = slide.getBoundingClientRect();
+      const centre    = (rect.left + rect.right) / 2;
+      const distance  = centre - viewportCentre;
+      let scale, offsetX;
+      if (distance > 0) {
+        scale   = Math.min(1.75, 1 + distance / window.innerWidth);
+        offsetX = (scale - 1) * 300;
+      } else {
+        scale   = Math.max(0.5, 1 - Math.abs(distance) / window.innerWidth);
+        offsetX = 0;
+      }
+      gsap.set(slide, { scale: scale, x: offsetX });
+    });
+  }
+
+  // Render loop for smooth horizontal motion
+  function animate() {
+    current = lerp(current, target, ease);
+    gsap.set(sliderWrapper, { x: -current });
+    updateScaleAndPosition();
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // Wheel handler: only runs when slider is pinned and still visible
+  function handleWheel(e) {
+    const rect        = slider.getBoundingClientRect();
+    const pinned      = rect.top <= 0 && rect.bottom > 0;  // element at top AND still visible:contentReference[oaicite:3]{index=3}
+    if (!pinned) return;
+
+    if (e.deltaY < 0 && target <= 0) return;
+    if (e.deltaY > 0 && target >= maxScroll) return;
+
+    target += e.deltaY;
+    target = Math.max(0, Math.min(target, maxScroll));
+    e.preventDefault();
+  }
+
+  // Observe when the slider enters/leaves the viewport
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        window.addEventListener('wheel', handleWheel, { passive: false });
+      } else {
+        window.removeEventListener('wheel', handleWheel, { passive: false });
+      }
+    });
+  }, { threshold: 0 });
+  observer.observe(slider);
+
+  // Lock the page at the slider’s top while horizontal scrolling is active
+  document.addEventListener('scroll', () => {
+    const rect  = slider.getBoundingClientRect();
+    const atTop = Math.abs(rect.top) <= 5;
+    if (atTop && target > 0 && target < maxScroll) {
+      const offset = slider.offsetTop;
+      if (window.scrollY !== offset) {
+        window.scrollTo(0, offset);
+      }
+    }
+  });
+
+  // Recalculate maxScroll on resize
+  window.addEventListener('resize', () => {
+    maxScroll = sliderWrapper.scrollWidth - window.innerWidth;
+    target    = Math.min(target, maxScroll);
+  });
+});
+
       </script>
   </body>
 </html>

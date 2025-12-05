@@ -1,0 +1,33 @@
+.intro-section {
+  background-color: brown;
+  /* height: 100vh; */
+  width: 100%;
+  height: 100vh;
+}
+
+.intro-headlines {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  perspective: 800px;
+}
+
+.intro-inner {
+  height: 100%;
+  width: 100%;
+}
+
+.is-large {
+  width: 100%;
+  font-size: 120px;
+  color: aliceblue !important;
+  z-index: 987;
+  transform-style: preserve-3d;
+  -webkit-mask-image: linear-gradient(to left, #000 0%, transparent 100%);
+  mask-image: linear-gradient(to left, #000 0%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  mask-position: right top;
+  text-align: center;
+}
